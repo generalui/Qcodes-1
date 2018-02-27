@@ -15,13 +15,13 @@ from qcodes.instrument.parameter import ArrayParameter, _BaseParameter
 from qcodes.dataset.experiment_container import Experiment
 from qcodes.dataset.param_spec import ParamSpec
 from qcodes.dataset.data_set import DataSet
+from qcodes import config
 
 log = logging.getLogger(__name__)
 
 
 class ParameterTypeError(Exception):
     pass
-
 
 class DataSaver:
     """
@@ -32,6 +32,11 @@ class DataSaver:
     def __init__(self, dataset: DataSet, write_period: float,
                  parameters: Dict[str, ParamSpec]) -> None:
         self._dataset = dataset
+        if 'run_tables_subscription_callback' in config.user:
+            callback = config.user.run_tables_subscription_callback
+            min_wait = config.user.run_tables_subscription_min_wait
+            min_count = config.user.run_tables_subscription_min_count
+            self._dataset.subscribe(callback, min_wait= min_wait, min_count= min_count, state={}, callback_kwargs={'run_id': self._dataset.run_id })
         self.write_period = write_period
         self.parameters = parameters
         self._known_parameters = list(parameters.keys())
