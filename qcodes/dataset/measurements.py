@@ -36,7 +36,8 @@ class DataSaver:
             callback = config.user.run_tables_subscription_callback
             min_wait = config.user.run_tables_subscription_min_wait
             min_count = config.user.run_tables_subscription_min_count
-            self._dataset.subscribe(callback, min_wait= min_wait, min_count= min_count, state={}, callback_kwargs={'run_id': self._dataset.run_id })
+            snapshot = dataset.get_metadata('snapshot')
+            self._dataset.subscribe(callback, min_wait= min_wait, min_count= min_count, state={}, callback_kwargs={'run_id': self._dataset.run_id, 'snapshot': snapshot })
         self.write_period = write_period
         self.parameters = parameters
         self._known_parameters = list(parameters.keys())
